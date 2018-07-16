@@ -21,13 +21,15 @@ class VggNet(object):
 		self.num_classes = num_classes
 
 	def forward(self,input):
-		out = self.make_layer(input,cfg[self.vggname])
+		regularizer = tf.contrib.layers.l2_regularizer(scale=5e-4)
+		out = self.make_layer(input,cfg[self.vggname],regularizer)
 		out = tf.layers.flatten(out,name='flatten')
-		predicts = tf.layers.dense(out,units=self.num_classes,name='fc_1')
-		return predicts
+		predicts = tf.layers.dense(out,units=self.num_classes,kernel_regularizer=regularizer,name='fc_1')
+		softmax_out = tf.nn.softmax(predicts)
+		return predicts,softmax_out
 
 
-	def make_layer(self,inputs,netparam):
+	def make_layer(self,inputs,netparam,regularizer):
 		pool_num = 0
 		conv_num = 0
 		for param in netparam:
@@ -36,19 +38,23 @@ class VggNet(object):
 				pool_num+=1
 			else:
 				inputs = tf.layers.conv2d(inputs,filters=param,kernel_size=3,padding='same',activation=tf.nn.relu,
-					kernel_initializer=tf.contrib.layers.xavier_initializer(),name='conv_'+str(conv_num))
+					kernel_initializer=tf.contrib.layers.xavier_initializer(),kernel_regularizer=regularizer,name='conv_'+str(conv_num))
 				conv_num+=1
 		inputs = tf.layers.average_pooling2d(inputs,pool_size=1,strides=1)
 		return inputs
 
-
+	def loss(self,predicts,labels):
+		losses = tf.reduce_mean(tf.losses.sparse_softmax_cross_entropy(labels,predicts))
+		l2_reg = tf.losses.get_regularization_losses()
+		losses+=tf.add_n(l2_reg)
+		return losses
 
 if __name__=='__main__':
 	with tf.device('/cpu:0'):
 		net = VggNet(vggname='VGG16')
 		data = np.random.randn(64,32,32,3)
 		inputs = tf.placeholder(tf.float32,[64,32,32,3])
-		predicts = net.forward(inputs)
+		predicts,softmax_out = net.forward(inputs)
 		config = tf.ConfigProto(allow_soft_placement=True)
 		config.gpu_options.allow_growth=True
 		init = tf.global_variables_initializer()

@@ -4,7 +4,7 @@ from __future__ import print_function
 
 import os
 import tensorflow as tf 
-from config.cfg import dataset_params
+import config.cfg as cfg 
 
 
 _HEIGHT = 32
@@ -58,7 +58,10 @@ def preprocess_image(image, is_training):
 	image = tf.image.per_image_standardization(image)
 	return image
 
-def input_fn(is_training, data_dir, batch_size, num_epochs=1):
+def input_fn(is_training, common_params,dataset_params):
+	data_dir = dataset_params['data_path']
+	batch_size = common_params['batch_size']
+	num_epochs = common_params['num_epochs']
 	filenames = get_filenames(is_training,data_dir)
 	dataset = tf.data.FixedLengthRecordDataset(filenames,_RECORD_BYTES)
 	dataset = dataset.prefetch(buffer_size=batch_size)
@@ -74,6 +77,15 @@ def input_fn(is_training, data_dir, batch_size, num_epochs=1):
 	dataset = dataset.prefetch(buffer_size=tf.contrib.data.AUTOTUNE)
 	return dataset
 
+def cifar_dataset(common_params,dataset_params):
+	train_dataset = input_fn(True,common_params,dataset_params)
+	test_dataset = input_fn(False,common_params,dataset_params)
+	dataset = {
+		'train':train_dataset,
+		'test':test_dataset
+	}
+	return dataset
+
 if __name__=='__main__':
-	dataset = input_fn(True,dataset_params['data_path'],64,135)
+	dataset = input_fn(True,cfg.common_params,cfg.dataset_params)
 	print(dataset)
