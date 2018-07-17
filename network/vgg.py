@@ -49,9 +49,30 @@ class VggNet(object):
 		losses+=tf.add_n(l2_reg)
 		return losses
 
+
+def vgg11():
+	net = VggNet(vggname='VGG11')
+	return net 
+
+
+def vgg13():
+	net = VggNet(vggname='VGG13')
+	return net 
+
+
+def vgg16():
+	net = VggNet(vggname='VGG16')
+	return net 
+
+
+def vgg19():
+	net = VggNet(vggname='VGG19')
+	return net 
+
+
 if __name__=='__main__':
 	with tf.device('/cpu:0'):
-		net = VggNet(vggname='VGG16')
+		net = vgg16()
 		data = np.random.randn(64,32,32,3)
 		inputs = tf.placeholder(tf.float32,[64,32,32,3])
 		predicts,softmax_out = net.forward(inputs)
