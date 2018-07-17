@@ -24,8 +24,7 @@ class XceptionNet(object):
 
 	def separable_conv2d(self,inputs,output_channel):
 		inputs = tf.layers.separable_conv2d(inputs,filters=output_channel,kernel_size=3,padding='same',
-					depthwise_initializer=self.initializer,pointwise_initializer=self.initializer,
-					depthwise_regularizer=self.regularizer,pointwise_regularizer=self.regularizer)
+					depthwise_initializer=self.initializer,pointwise_initializer=self.initializer,pointwise_regularizer=self.regularizer)
 		inputs = tf.layers.batch_normalization(inputs,training=self.is_training)
 		return inputs
 

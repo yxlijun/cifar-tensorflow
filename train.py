@@ -4,11 +4,18 @@ from __future__ import print_function
 
 import config.cfg as cfg 
 from solver.solver_cifar import Solver
-from network.vgg import VggNet
 from data.dataset import cifar_dataset
 
 import argparse 
 import tensorflow as tf 
+
+
+from network.vgg import vgg11,vgg13,vgg16,vgg19
+from network.resnet import resnet20,resnet32,resnet44,resnet56
+from network.xception import XceptionNet
+from network.mobileNet import MobileNet
+from network.denseNet import DensetNet40_12,DenseNet100_12,DenseNet100_24,DenseNetBC100_12,DenseNetBC250_24,DenseNetBC190_40
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--lr',type=float,default=0.01,help='cifar_10 learning_rate')
@@ -24,7 +31,7 @@ def main(_):
 	common_params = cfg.merge_params(FLAGS)
 	print(common_params)
 	dataset = cifar_dataset(common_params,cfg.dataset_params)
-	network = VggNet('VGG16')
+	network = DenseNet100_12()
 	solver = Solver(network,dataset,cfg.common_params)
 	solver.solve()
 

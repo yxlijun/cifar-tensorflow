@@ -24,7 +24,6 @@ class Resnet(object):
 		inputs_width = inputs.shape[-2]
 		if input_channel!=output_channel or x_width !=inputs_width:
 			residual = self.conv2d(residual,output_channel,kernel_size=1,stride=stride[1],relu=False)
-		print(residual.shape,inputs.shape)
 		return tf.nn.relu(tf.add(inputs,residual))
 
 	def conv2d(self,inputs,output_channel,kernel_size=3,stride=1,relu=True):
@@ -34,7 +33,7 @@ class Resnet(object):
 		inputs =  tf.nn.relu(inputs) if relu else inputs
 		return inputs
 
-	def forward(self,input):
+	def forward(self,inputs):
 		out = self.conv2d(inputs,16)
 		out = self.make_layer(out,[16,32])
 		out = self.make_layer(out,[32,64])
@@ -58,7 +57,6 @@ class Resnet(object):
 		l2_reg = tf.losses.get_regularization_losses()
 		losses+=tf.add_n(l2_reg)
 		return losses
-
 
 '''
 layer number :6*stack_num+2
