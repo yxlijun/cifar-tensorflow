@@ -72,8 +72,6 @@ class DenseNet(object):
 		softmax_out = tf.nn.softmax(predicts)
 		return predicts,softmax_out
 
-
-
 	def loss(self,predicts,labels):
 		losses = tf.reduce_mean(tf.losses.sparse_softmax_cross_entropy(labels,predicts))
 		l2_reg = tf.losses.get_regularization_losses()
