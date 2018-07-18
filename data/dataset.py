@@ -60,7 +60,7 @@ def preprocess_image(image, is_training):
 
 def input_fn(is_training, common_params,dataset_params):
 	data_dir = dataset_params['data_path']
-	batch_size = common_params['batch_size'] if is_training else _NUM_IMAGES['validation']
+	batch_size = common_params['batch_size']
 	num_epochs = common_params['num_epochs']
 	filenames = get_filenames(is_training,data_dir)
 	dataset = tf.data.FixedLengthRecordDataset(filenames,_RECORD_BYTES)
@@ -87,5 +87,10 @@ def cifar_dataset(common_params,dataset_params):
 	return dataset
 
 if __name__=='__main__':
-	dataset = input_fn(False,cfg.common_params,cfg.dataset_params)
+	dataset = cifar_dataset(cfg.common_params,cfg.dataset_params)
+	iterator = dataset['test'].make_one_shot_iterator()
+	next_element = iterator.get_next()
+	sess = tf.Session()
+	images,labels = sess.run(next_element)
+	print(images.shape)
 	print(dataset)

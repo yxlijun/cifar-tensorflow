@@ -26,8 +26,8 @@ class Solver(object):
 
 	def construct_graph(self):
 		self.global_step = tf.Variable(0, trainable=False)
-		self.images = tf.placeholder(tf.float32, (self.batch_size, self.height, self.width, 3))
-		self.labels = tf.placeholder(tf.int32, self.batch_size)
+		self.images = tf.placeholder(tf.float32, (None, self.height, self.width, 3))
+		self.labels = tf.placeholder(tf.int32, None)
 		self.predicts,self.softmax_out = self.net.forward(self.images)
 		self.total_loss = self.net.loss(self.predicts,self.labels)
 		self.train_op = tf.train.MomentumOptimizer(self.learning_rate, self.moment).minimize(self.total_loss,global_step=self.global_step)
@@ -39,7 +39,7 @@ class Solver(object):
 		train_iterator = self.dataset['train'].make_one_shot_iterator()
 		train_dataset = train_iterator.get_next()
 		test_iterator = self.dataset['test'].make_one_shot_iterator()
-		test_dataset = train_iterator.get_next()
+		test_dataset = test_iterator.get_next()
 
 		init = tf.global_variables_initializer()
 		config = tf.ConfigProto(allow_soft_placement=True)
@@ -62,6 +62,7 @@ class Solver(object):
 		        	print('Iter step:%d loss:%.4f accuracy:%.4f' %(step,loss,total_accuracy/acc_count))
 		        if step % self.predict_step == 0:
 		        	test_images,test_labels = sess.run(test_dataset)
+		        	print(test_images.shape)
 		        	acc = sess.run(self.accuracy,feed_dict={self.images:test_images,self.labels:test_labels})
 		        	print('test loss:%.4f' %(acc))
 		       	step+=1
