@@ -16,6 +16,7 @@ from network.xception import XceptionNet
 from network.mobileNet import MobileNet
 from network.denseNet import DensetNet40_12,DenseNet100_12,DenseNet100_24,DenseNetBC100_12,DenseNetBC250_24,DenseNetBC190_40
 from network.resnext import ResNext50,ResNext101
+from network.squeezeNet import SqueezeNetA,SqueezeNetB
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--lr',type=float,default=0.01,help='cifar_10 learning_rate')
@@ -31,7 +32,7 @@ def main(_):
 	common_params = cfg.merge_params(FLAGS)
 	print(common_params)
 	dataset = cifar_dataset(common_params,cfg.dataset_params)
-	network = vgg11()
+	network = SqueezeNetA()
 	solver = Solver(network,dataset,cfg.common_params)
 	solver.solve()
 
