@@ -36,7 +36,7 @@ class SqueezeNet(object):
 		elif mode =='B':
 			self.make_layer = self.make_layerB
 		else:
-			self.make_layer = self.make_layerC
+			raise Exception("mode must be A or B")
 
 
 	def Fiber_module(self,inputs,out_channel):
