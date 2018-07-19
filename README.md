@@ -33,13 +33,24 @@ python test.py --net vgg16
 | [VGG13](https://arxiv.org/abs/1409.1556)          | 93.02%      |
 | [VGG16](https://arxiv.org/abs/1409.1556)          | 93.62%      |
 | [VGG19](https://arxiv.org/abs/1409.1556)         | 93.75%      |
-| [Resnet](https://arxiv.org/abs/1801.04381)       | 94.43%      |
-| [ResNeXt29(32x4d)](https://arxiv.org/abs/1611.05431)  | 94.73%      |
-| [ResNeXt29(2x64d)](https://arxiv.org/abs/1611.05431)  | 94.82%      |
-| [DenseNet121](https://arxiv.org/abs/1608.06993)       | 95.04%      |
-| [PreActResNet18](https://arxiv.org/abs/1603.05027)    | 95.11%      |
-| [DPN92](https://arxiv.org/abs/1707.01629)             | 95.16%      |
- 
+| [Resnet20](https://arxiv.org/abs/1512.03385)       | 94.43%      |
+| [Resnet32](https://arxiv.org/abs/1512.03385)  | 94.73%      |
+| [Resnet44](https://arxiv.org/abs/1512.03385)  | 94.82%      |
+| [Resnet56](https://arxiv.org/abs/1512.03385)       | 95.04%      |
+| [Xception](https://arxiv.org/abs/1610.02357)    | 95.11%      |
+| [MobileNet](https://arxiv.org/abs/1704.04861)             | 95.16%      |
+| [DensetNet40_12](https://arxiv.org/abs/1608.06993) | 94.24% |
+| [DenseNet100_12](https://arxiv.org/abs/1608.06993)| 95.21%  |
+| [DenseNet100_24](https://arxiv.org/abs/1608.06993)| 95.21%  |
+| [DenseNet100_24](https://arxiv.org/abs/1608.06993)| 95.21%  |
+| [ResNext50](https://arxiv.org/abs/1611.05431)| 95.21%  |
+| [ResNext101](https://arxiv.org/abs/1611.05431)| 95.21%  |
+| [SqueezeNetA](https://arxiv.org/abs/1602.07360)| 95.21%  |
+| [SqueezeNetB](https://arxiv.org/abs/1602.07360)| 95.21%  |
+| [SE_Resnet_50](https://arxiv.org/abs/1709.01507)| 95.21%  |
+| [SE_Resnet_101](https://arxiv.org/abs/1709.01507)| 95.21%  |
+
+
 ### Net implement
 - [x] VGG
 - [x] ResNet
