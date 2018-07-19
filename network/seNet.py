@@ -89,7 +89,7 @@ class SeNet(object):
 		out = tf.layers.flatten(out,name='flatten')
 		out = tf.layers.dropout(out,rate=0.5,name='dropout')
 		predicts = tf.layers.dense(out,units=self.num_classes,kernel_regularizer=self.regularizer,name='fc_'+str(self.fc_num))
-		softmax_out = tf.nn.softmax(predicts)
+		softmax_out = tf.nn.softmax(predicts,name='output')
 		
 		return predicts,softmax_out
 

@@ -25,7 +25,7 @@ class VggNet(object):
 		out = self.make_layer(input,cfg[self.vggname],regularizer)
 		out = tf.layers.flatten(out,name='flatten')
 		predicts = tf.layers.dense(out,units=self.num_classes,kernel_regularizer=regularizer,name='fc_1')
-		softmax_out = tf.nn.softmax(predicts)
+		softmax_out = tf.nn.softmax(predicts,name='output')
 		return predicts,softmax_out
 
 

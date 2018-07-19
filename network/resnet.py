@@ -41,7 +41,7 @@ class Resnet(object):
 		out = tf.layers.average_pooling2d(out,pool_size=8,strides=1)
 		out = tf.layers.flatten(out)
 		predicts = tf.layers.dense(out,units=self.num_classes,kernel_regularizer=self.regularizer)
-		softmax_out = tf.nn.softmax(predicts)
+		softmax_out = tf.nn.softmax(predicts,name='output')
 		return predicts,softmax_out
 
 	def make_layer(self,inputs,output_channel):

@@ -86,9 +86,28 @@ def cifar_dataset(common_params,dataset_params):
 	}
 	return dataset
 
+def input_fn_test(dataset_params):
+	data_dir = dataset_params['data_path']
+	batch_size = _NUM_IMAGES['validation']
+	filenames = get_filenames(False,data_dir)
+	dataset = tf.data.FixedLengthRecordDataset(filenames,_RECORD_BYTES)
+	dataset = dataset.prefetch(buffer_size=batch_size)
+	dataset = dataset.apply(tf.contrib.data.map_and_batch(
+		lambda value: parse_record(value, False),
+		batch_size=batch_size,
+		num_parallel_batches=1,
+		drop_remainder=False))	
+
+	dataset = dataset.prefetch(buffer_size=tf.contrib.data.AUTOTUNE)
+	return dataset
+
+def cifar_dataset_test(dataset_params):
+	dataset = input_fn_test(dataset_params)
+	return dataset
+
 if __name__=='__main__':
-	dataset = cifar_dataset(cfg.common_params,cfg.dataset_params)
-	iterator = dataset['test'].make_one_shot_iterator()
+	dataset = cifar_dataset_test(cfg.dataset_params)
+	iterator = dataset.make_one_shot_iterator()
 	next_element = iterator.get_next()
 	sess = tf.Session()
 	images,labels = sess.run(next_element)

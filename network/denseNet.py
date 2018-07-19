@@ -69,7 +69,7 @@ class DenseNet(object):
 		out = tf.layers.flatten(out)
 		out = tf.layers.dropout(out,rate=0.5)
 		predicts = tf.layers.dense(out,units=self.num_classes,kernel_regularizer=self.regularizer,name='fc')
-		softmax_out = tf.nn.softmax(predicts)
+		softmax_out = tf.nn.softmax(predicts,name='output')
 		return predicts,softmax_out
 
 	def loss(self,predicts,labels):

@@ -10,9 +10,9 @@ os.environ['CUDA_VISIBLE_DEVICE'] = '1'
 
 class Solver(object):
 	"""docstring for Solver"""
-	def __init__(self, net,dataset,common_params):
+	def __init__(self, net_config,dataset,common_params,dataset_params):
 		super(Solver, self).__init__()
-		self.net = net 
+		self.net = net_config['network'] 
 		self.dataset = dataset
 		self.learning_rate = common_params['learning_rate']
 		self.moment = common_params['moment']
@@ -22,11 +22,17 @@ class Solver(object):
 		self.display_step = common_params['display_step']
 		self.predict_step = common_params['predict_step']
 
+		self.netname = net_config['netname']
+		model_dir = os.path.join(dataset_params['model_path'],self.netname,'ckpt')
+		if not tf.gfile.Exists(model_dir):
+			tf.gfile.MakeDirs(model_dir)
+		self.model_name = os.path.join(model_dir,'model.ckpt')
+
 		self.construct_graph()
 
 	def construct_graph(self):
 		self.global_step = tf.Variable(0, trainable=False)
-		self.images = tf.placeholder(tf.float32, (None, self.height, self.width, 3))
+		self.images = tf.placeholder(tf.float32, (None, self.height, self.width, 3),name='input')
 		self.labels = tf.placeholder(tf.int32, None)
 		self.predicts,self.softmax_out = self.net.forward(self.images)
 		self.total_loss = self.net.loss(self.predicts,self.labels)
@@ -42,12 +48,13 @@ class Solver(object):
 		test_dataset = test_iterator.get_next()
 
 		init = tf.global_variables_initializer()
+		saver = tf.train.Saver()
 		config = tf.ConfigProto(allow_soft_placement=True)
 		config.gpu_options.allow_growth=True
 		init = tf.global_variables_initializer()
 		sess = tf.Session(config=config)
 		sess.run(init)
-		step = 1
+		step = 0
 		acc_count = 0
 		total_accuracy = 0
 		try:
@@ -62,9 +69,10 @@ class Solver(object):
 		        	print('Iter step:%d loss:%.4f accuracy:%.4f' %(step,loss,total_accuracy/acc_count))
 		        if step % self.predict_step == 0:
 		        	test_images,test_labels = sess.run(test_dataset)
-		        	print(test_images.shape)
 		        	acc = sess.run(self.accuracy,feed_dict={self.images:test_images,self.labels:test_labels})
 		        	print('test loss:%.4f' %(acc))
+		        if step % 5000 == 0:
+        			saver.save(sess, self.model_name, global_step=step)
 		       	step+=1
 		except tf.errors.OutOfRangeError:
 		    print("finish training !")

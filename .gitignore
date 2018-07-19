@@ -1,2 +1,4 @@
 */cifar-10-batches-bin
 *.pyc
+*pb
+*ckpt
