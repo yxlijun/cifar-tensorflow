@@ -39,6 +39,11 @@ class Solver(object):
 			tf.gfile.MakeDirs(model_dir)
 		self.model_name = os.path.join(model_dir,'model.ckpt')
 
+
+		self.log_dir = os.path.join(dataset_params['model_path'],self.netname,'log')
+		if not tf.gfile.Exists(self.log_dir):
+			tf.gfile.MakeDirs(self.log_dir)
+
 		self.construct_graph()
 
 
@@ -63,6 +68,9 @@ class Solver(object):
 		correct_pred = tf.equal(tf.argmax(self.softmax_out,1,output_type=tf.int32),self.labels)
 		self.accuracy = tf.reduce_mean(tf.cast(correct_pred,tf.float32))
 
+		tf.summary.scalar('loss',self.total_loss)
+		tf.summary.scalar('accuracy',self.accuracy)
+
 	def solve(self):
 		train_iterator = self.dataset['train'].make_one_shot_iterator()
 		train_dataset = train_iterator.get_next()
@@ -74,13 +82,18 @@ class Solver(object):
 		bn_moving_vars = [g for g in g_list if 'moving_mean' in g.name]
 		bn_moving_vars += [g for g in g_list if 'moving_variance' in g.name]
 		var_list += bn_moving_vars
-		
+
 		saver = tf.train.Saver(var_list=var_list)
 		config = tf.ConfigProto(allow_soft_placement=True)
 		config.gpu_options.allow_growth=True
 		init = tf.global_variables_initializer()
+
+		summary_op = tf.summary.merge_all()
+
 		sess = tf.Session(config=config)
 		sess.run(init)
+		summary_writer = tf.summary.FileWriter(self.log_dir, sess.graph)
+
 		step = 0
 		acc_count = 0
 		total_accuracy = 0
@@ -96,6 +109,8 @@ class Solver(object):
 		        	loss = sess.run(self.total_loss,feed_dict={self.images:images,self.labels:labels,self.is_training:True,self.keep_prob:0.5})
 		        	print('Iter step:%d learning rate:%.4f loss:%.4f accuracy:%.4f' %(step,lr,loss,total_accuracy/acc_count))
 		        if step % self.predict_step == 0:
+		        	summary_str = sess.run(summary_op,feed_dict={self.images:images,self.labels:labels,self.is_training:True,self.keep_prob:0.5})
+		        	summary_writer.add_summary(summary_str,step)
 		        	test_images,test_labels = sess.run(test_dataset)
 		        	acc = sess.run(self.accuracy,feed_dict={self.images:test_images,self.labels:test_labels,self.is_training:False,self.keep_prob:1.0})
 		        	print('test loss:%.4f' %(acc))

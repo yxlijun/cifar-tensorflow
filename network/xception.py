@@ -21,7 +21,7 @@ class XceptionNet(object):
 
 	def conv2d(self,inputs,output_channel,kernel_size,stride=1):
 		inputs = tf.layers.conv2d(inputs,filters=output_channel,kernel_size=kernel_size,strides=stride,padding='same',
-					kernel_initializer=self.initializer,kernel_regularizer=self.regularizer,name-'conv_'+str(self.conv_num))
+					kernel_initializer=self.initializer,kernel_regularizer=self.regularizer,name='conv_'+str(self.conv_num))
 		inputs = tf.layers.batch_normalization(inputs,training=self.is_training,name='bn_'+str(self.conv_num))
 		self.conv_num+=1
 		return tf.nn.relu(inputs)

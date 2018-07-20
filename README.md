@@ -29,7 +29,7 @@ python test.py --net vgg16
 
 | Model             | Acc.        |
 | ----------------- | ----------- |
-| [VGG11](https://arxiv.org/abs/1409.1556)              | 92.64%      |
+| [VGG11](https://arxiv.org/abs/1409.1556)              | 91.35%      |
 | [VGG13](https://arxiv.org/abs/1409.1556)          | 93.02%      |
 | [VGG16](https://arxiv.org/abs/1409.1556)          | 93.62%      |
 | [VGG19](https://arxiv.org/abs/1409.1556)         | 93.75%      |
