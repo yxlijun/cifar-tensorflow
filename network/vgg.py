@@ -15,31 +15,42 @@ cfg = {
 
 class VggNet(object):
 	"""docstring for VggNet"""
-	def __init__(self, vggname,num_classes=10):
+	def __init__(self, vggname,is_training,keep_prob = 0.5,num_classes=10):
 		super(VggNet, self).__init__()
 		self.vggname = vggname 
 		self.num_classes = num_classes
 
+		self.regularizer = tf.contrib.layers.l2_regularizer(scale=5e-4)
+		self.initializer = tf.contrib.layers.xavier_initializer()
+
+		self.pool_num = 0
+		self.conv_num = 0
+		self.is_training = is_training
+
+		self.keep_prob = keep_prob
+		
 	def forward(self,input):
-		regularizer = tf.contrib.layers.l2_regularizer(scale=5e-4)
-		out = self.make_layer(input,cfg[self.vggname],regularizer)
+		out = self.make_layer(input,cfg[self.vggname])
 		out = tf.layers.flatten(out,name='flatten')
-		predicts = tf.layers.dense(out,units=self.num_classes,kernel_regularizer=regularizer,name='fc_1')
+		predicts = tf.layers.dense(out,units=self.num_classes,kernel_initializer=self.initializer,kernel_regularizer=self.regularizer,name='fc_1')
 		softmax_out = tf.nn.softmax(predicts,name='output')
 		return predicts,softmax_out
 
 
-	def make_layer(self,inputs,netparam,regularizer):
-		pool_num = 0
-		conv_num = 0
+	def conv2d(self,inputs,out_channel):
+		inputs = tf.layers.conv2d(inputs,filters=out_channel,kernel_size=3,padding='same',
+					kernel_initializer=self.initializer,kernel_regularizer=self.regularizer,name='conv_'+str(self.conv_num))
+		inputs = tf.layers.batch_normalization(inputs,training=self.is_training,name='bn_'+str(self.conv_num))
+		self.conv_num+=1
+		return tf.nn.relu(inputs)
+
+	def make_layer(self,inputs,netparam):
 		for param in netparam:
 			if param=='M':
-				inputs = tf.layers.max_pooling2d(inputs,pool_size=2,strides=2,padding='same',name='pool_'+str(pool_num))
-				pool_num+=1
+				inputs = tf.layers.max_pooling2d(inputs,pool_size=2,strides=2,padding='same',name='pool_'+str(self.pool_num))
+				self.pool_num+=1
 			else:
-				inputs = tf.layers.conv2d(inputs,filters=param,kernel_size=3,padding='same',activation=tf.nn.relu,
-					kernel_initializer=tf.contrib.layers.xavier_initializer(),kernel_regularizer=regularizer,name='conv_'+str(conv_num))
-				conv_num+=1
+				inputs = self.conv2d(inputs,param)
 		inputs = tf.layers.average_pooling2d(inputs,pool_size=1,strides=1)
 		return inputs
 
@@ -50,23 +61,23 @@ class VggNet(object):
 		return losses
 
 
-def vgg11():
-	net = VggNet(vggname='VGG11')
+def vgg11(is_training=True,keep_prob=0.5):
+	net = VggNet(vggname='VGG11',is_training=is_training,keep_prob=keep_prob)
 	return net 
 
 
-def vgg13():
-	net = VggNet(vggname='VGG13')
+def vgg13(is_training=True,keep_prob=0.5):
+	net = VggNet(vggname='VGG13',is_training=is_training,keep_prob=keep_prob)
 	return net 
 
 
-def vgg16():
-	net = VggNet(vggname='VGG16')
+def vgg16(is_training=True,keep_prob=0.5):
+	net = VggNet(vggname='VGG16',is_training=is_training,keep_prob=keep_prob)
 	return net 
 
 
-def vgg19():
-	net = VggNet(vggname='VGG19')
+def vgg19(is_training=True,keep_prob=0.5):
+	net = VggNet(vggname='VGG19',is_training=is_training,keep_prob=keep_prob)
 	return net 
 
 

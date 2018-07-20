@@ -8,9 +8,9 @@ dataset_params = {
 common_params = {
 	'batch_size':64,
 	'image_size':(32,32),
-	'learning_rate':0.01,
+	'learning_rate':0.1,
 	'moment':0.9,
-	'display_step':10,
+	'display_step':100,
 	'num_epochs':200,
 	'predict_step':500
 }
@@ -18,6 +18,8 @@ common_params = {
 
 graph_node = {
 	'input':'input:0',
+	'is_training':'is_training:0',
+	'keep_prob':'keep_prob:0',
 	'output':'output:0'
 }
 

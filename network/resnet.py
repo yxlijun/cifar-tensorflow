@@ -7,13 +7,14 @@ import numpy as np
 
 class Resnet(object):
 	"""docstring for Resnet"""
-	def __init__(self, stack_num=3,num_classes=10,is_training=True):
+	def __init__(self,is_training,keep_prob,stack_num=3,num_classes=10):
 		super(Resnet, self).__init__()
 		self.num_classes = num_classes
 		self.is_training = is_training
 		self.regularizer = tf.contrib.layers.l2_regularizer(scale=1e-4)
 		self.initializer = tf.contrib.layers.xavier_initializer()
 		self.stack_num = stack_num
+		self.keep_prob = keep_prob
 
 	def residual_block(self,inputs,output_channel,stride=[1,1]):
 		residual = tf.identity(inputs)
@@ -40,7 +41,7 @@ class Resnet(object):
 		out = self.make_layer(out,[64,64])
 		out = tf.layers.average_pooling2d(out,pool_size=8,strides=1)
 		out = tf.layers.flatten(out)
-		predicts = tf.layers.dense(out,units=self.num_classes,kernel_regularizer=self.regularizer)
+		predicts = tf.layers.dense(out,units=self.num_classes,kernel_initializer=self.initializer,kernel_regularizer=self.regularizer)
 		softmax_out = tf.nn.softmax(predicts,name='output')
 		return predicts,softmax_out
 
@@ -63,23 +64,23 @@ layer number :6*stack_num+2
 
 '''
 
-def resnet20():
-	net = Resnet(stack_num=3)
+def resnet20(is_training=True,keep_prob=0.5):
+	net = Resnet(is_training=is_training,keep_prob=keep_prob,stack_num=3)
 	return net 
 
 
-def resnet32():
-	net = Resnet(stack_num=5)
+def resnet32(is_training=True,keep_prob=0.5):
+	net = Resnet(is_training=is_training,keep_prob=keep_prob,stack_num=5)
 	return net 
 
 
-def resnet44():
-	net = Resnet(stack_num=7)
+def resnet44(is_training=True,keep_prob=0.5):
+	net = Resnet(is_training=is_training,keep_prob=keep_prob,stack_num=7)
 	return net 
 
 
-def resnet56():
-	net = Resnet(stack_num=9)
+def resnet56(is_training=True,keep_prob=0.5):
+	net = Resnet(is_training=is_training,keep_prob=keep_prob,stack_num=9)
 	return net 
 
 

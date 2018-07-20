@@ -8,10 +8,11 @@ import numpy as np
 
 class SeNet(object):
 	"""docstring for SeNet"""
-	def __init__(self, block_num,num_classes=10,is_training=True):
+	def __init__(self, block_num,is_training,keep_prob,num_classes=10):
 		super(SeNet, self).__init__()
 		self.num_classes = num_classes
 		self.is_training = is_training
+		self.keep_prob = keep_prob
 		self.block_nums = block_num
 
 		self.conv_num = 0
@@ -87,8 +88,8 @@ class SeNet(object):
 		h,w = inputs.shape[1] // 32 ,inputs.shape[2] // 32
 		out = tf.layers.average_pooling2d(out,pool_size=(h,w),strides=(h,w),padding='same',name='average_pool_'+str(self.average_num))
 		out = tf.layers.flatten(out,name='flatten')
-		out = tf.layers.dropout(out,rate=0.5,name='dropout')
-		predicts = tf.layers.dense(out,units=self.num_classes,kernel_regularizer=self.regularizer,name='fc_'+str(self.fc_num))
+		out = tf.layers.dropout(out,rate=self.keep_prob,name='dropout')
+		predicts = tf.layers.dense(out,units=self.num_classes,kernel_initializer=self.initializer,kernel_regularizer=self.regularizer,name='fc_'+str(self.fc_num))
 		softmax_out = tf.nn.softmax(predicts,name='output')
 		
 		return predicts,softmax_out
@@ -111,12 +112,12 @@ class SeNet(object):
 
 
 
-def SE_Resnet_50():
-	net = SeNet([3,4,6,3])
+def SE_Resnet_50(is_training=True,keep_prob=0.5):
+	net = SeNet([3,4,6,3],is_training=is_training,keep_prob=keep_prob)
 	return net 
 
-def SE_Resnet_101():
-	net = SeNet([3,4,23,3])
+def SE_Resnet_101(is_training=True,keep_prob=0.5):
+	net = SeNet([3,4,23,3],is_training=is_training,keep_prob=keep_prob)
 	return net 
 
 

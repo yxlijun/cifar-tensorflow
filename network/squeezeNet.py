@@ -18,7 +18,7 @@ net_config = {
 
 class SqueezeNet(object):
 	"""docstring for SqueezeNet"""
-	def __init__(self, net_config,mode='A',num_classes=10):
+	def __init__(self, net_config,is_training,keep_prob,mode='A',num_classes=10):
 		super(SqueezeNet, self).__init__()
 		self.num_classes = num_classes
 		self.conv_num = 0
@@ -30,6 +30,9 @@ class SqueezeNet(object):
 		self.incre = net_config['incre']
 		self.pct33 = net_config['pct33']
 		self.freq = net_config['freq']
+
+		self.is_training = is_training
+		self.keep_prob = keep_prob
 
 		if mode=='A':
 			self.make_layer = self.make_layerA
@@ -81,8 +84,8 @@ class SqueezeNet(object):
 
 		out = tf.layers.average_pooling2d(out,pool_size=(pool_size,pool_size),strides=(stride,stride),name='avg_pool_0')
 		out = tf.layers.flatten(out,name='flatten')
-		out = tf.layers.dropout(out,rate=0.5,name='dropout')
-		predicts = tf.layers.dense(out,units=self.num_classes,name='fc')
+		out = tf.layers.dropout(out,rate=self.keep_prob,name='dropout')
+		predicts = tf.layers.dense(out,units=self.num_classes,kernel_initializer=self.initializer,name='fc')
 		softmax_out = tf.nn.softmax(predicts,name='output')
 
 		return predicts,softmax_out
@@ -122,13 +125,13 @@ class SqueezeNet(object):
 
 
 
-def SqueezeNetA():
-	net = SqueezeNet(net_config=net_config)
+def SqueezeNetA(is_training=True,keep_prob=0.5):
+	net = SqueezeNet(net_config=net_config,is_training=is_training,keep_prob=keep_prob)
 	return net 
 
 
-def SqueezeNetB():
-	net = SqueezeNet(net_config=net_config,mode='B')
+def SqueezeNetB(is_training=True,keep_prob=0.5):
+	net = SqueezeNet(net_config=net_config,is_training=is_training,keep_prob=keep_prob,mode='B')
 	return net
 
 	

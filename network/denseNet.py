@@ -8,7 +8,7 @@ import numpy as np
 
 class DenseNet(object):
 	"""docstring for DenseNet"""
-	def __init__(self, k = 12,L = 40,base = True,num_classes=10,is_training=True,):
+	def __init__(self,is_training,keep_prob, k = 12,L = 40,base = True,num_classes=10):
 		super(DenseNet, self).__init__()
 		self.num_classes = num_classes
 		self.is_training = is_training
@@ -21,6 +21,8 @@ class DenseNet(object):
 		self.initializer = tf.contrib.layers.xavier_initializer()
 
 		self.per_block_num = (L - 4)//3 if self.base else (L - 4)//6
+
+		self.keep_prob = keep_prob
 
 	def bottle_block(self,inputs):
 		internel_out = tf.identity(inputs)
@@ -67,8 +69,8 @@ class DenseNet(object):
 		out = self.bottle_block(out)
 		out = tf.layers.average_pooling2d(out,pool_size=8,strides=8,padding='same')
 		out = tf.layers.flatten(out)
-		out = tf.layers.dropout(out,rate=0.5)
-		predicts = tf.layers.dense(out,units=self.num_classes,kernel_regularizer=self.regularizer,name='fc')
+		out = tf.layers.dropout(out,rate=self.keep_prob)
+		predicts = tf.layers.dense(out,units=self.num_classes,kernel_initializer=self.initializer,kernel_regularizer=self.regularizer,name='fc')
 		softmax_out = tf.nn.softmax(predicts,name='output')
 		return predicts,softmax_out
 
@@ -79,29 +81,29 @@ class DenseNet(object):
 		return losses
 
 
-def DensetNet40_12():
-	net = DenseNet(k=12,L = 40)
+def DensetNet40_12(is_training=True,keep_prob=0.5):
+	net = DenseNet(is_training=is_training,keep_prob = keep_prob,k=12,L = 40)
 	return net 
 
 
-def DenseNet100_12():
-	net = DenseNet(k=12,L=100)
+def DenseNet100_12(is_training=True,keep_prob=0.5):
+	net = DenseNet(is_training=is_training,keep_prob = keep_prob,k=12,L=100)
 	return net  
 
-def DenseNet100_24():
-	net = DenseNet(k=24,L = 100)
+def DenseNet100_24(is_training=True,keep_prob=0.5):
+	net = DenseNet(is_training=is_training,keep_prob = keep_prob,k=24,L = 100)
 	return net 
 
-def DenseNetBC100_12():
-	net = DenseNet(k = 12,L = 100,base=False)
+def DenseNetBC100_12(is_training=True,keep_prob=0.5):
+	net = DenseNet(is_training=is_training,keep_prob = keep_prob,k = 12,L = 100,base=False)
 	return net 
 
-def DenseNetBC250_24():
-	net = DenseNet(k = 24,L = 250,base = False)
+def DenseNetBC250_24(is_training=True,keep_prob=0.5):
+	net = DenseNet(is_training=is_training,keep_prob = keep_prob,k = 24,L = 250,base = False)
 	return net 
 
-def DenseNetBC190_40():
-	net = DenseNet(k = 40,L = 190,base = False)
+def DenseNetBC190_40(is_training=True,keep_prob=0.5):
+	net = DenseNet(is_training=is_training,keep_prob = keep_prob,k = 40,L = 190,base = False)
 	return net 
 
 

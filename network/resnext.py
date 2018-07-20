@@ -8,7 +8,7 @@ import numpy as np
 
 class resNext(object):
 	"""docstring for resNext"""
-	def __init__(self, block_num,num_classes=10,is_training=True):
+	def __init__(self, block_num,is_training,keep_prob,num_classes=10):
 		super(resNext, self).__init__()
 		self.num_classes = num_classes
 		self.is_training = is_training
@@ -21,6 +21,7 @@ class resNext(object):
 		self.initializer = tf.contrib.layers.xavier_initializer()
 
 		self.cardinality = 32
+		self.keep_prob = keep_prob
 
 	def bottleneck_layer(self,inputs,out_channel,stride):
 		residual = tf.identity(inputs)
@@ -85,8 +86,8 @@ class resNext(object):
 
 		out = tf.layers.average_pooling2d(out,pool_size=(pool_size,pool_size),strides=(stride,stride),name='avg_pool')
 		out = tf.layers.flatten(out,name='flatten')
-		out = tf.layers.dropout(out,rate=0.5,name='dropout')
-		predicts = tf.layers.dense(out,units=self.num_classes,kernel_regularizer=self.regularizer,name='fc')
+		out = tf.layers.dropout(out,rate=self.keep_prob,name='dropout')
+		predicts = tf.layers.dense(out,units=self.num_classes,kernel_initializer=self.initializer,kernel_regularizer=self.regularizer,name='fc')
 		softmax_out = tf.nn.softmax(predicts,name='output')
 		
 		return predicts,softmax_out
@@ -111,22 +112,21 @@ class resNext(object):
 
 
 
-def ResNext50():
+def ResNext50(is_training=True,keep_prob=0.5):
 	'''
 		stage1: 1x1x128->group conv->3x3x128 cardinality 32 ->1x1x256
 		stage2: 1x1x256->group conv->3x3x256 cardinality 32 ->1x1x512
 		stage3: 1x1x512->group conv->3x3x512 cardinality 32 ->1x1x1024
 		stage4: 1x1x1024->group conv->3x3x1024 cardinality 32 ->1x1x2048
 	'''
-	net = resNext([3,4,6,3])
+	net = resNext([3,4,6,3],is_training=is_training,keep_prob=keep_prob)
 	return net 
 
 
 
-def ResNext101():
-	net = resNext([3,4,23,3])
+def ResNext101(is_training=True,keep_prob=0.5):
+	net = resNext([3,4,23,3],is_training=is_training,keep_prob=keep_prob)
 	return net 
-
 
 
 if __name__=='__main__':

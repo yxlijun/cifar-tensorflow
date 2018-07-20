@@ -7,7 +7,7 @@ import numpy as np
 
 class MobileNet(object):
 	"""docstring for MobileNet"""
-	def __init__(self, num_classes=10,is_training=True):
+	def __init__(self,is_training=True,keep_prob=0.5,num_classes=10):
 		super(MobileNet, self).__init__()
 		self.num_classes = num_classes
 		self.is_training = is_training
@@ -15,7 +15,7 @@ class MobileNet(object):
 		self.weight_decay = 5e-4
 		self.regularizer = tf.contrib.layers.l2_regularizer(scale=self.weight_decay)
 		self.initializer = tf.contrib.layers.xavier_initializer()
-
+		self.keep_prob = keep_prob
 
 	def conv2d(self,inputs,out_channel,kernel_size=1,stride=1):
 		inputs = tf.layers.conv2d(inputs,filters=out_channel,kernel_size=kernel_size,strides=stride,padding='same',
@@ -62,8 +62,8 @@ class MobileNet(object):
 		out = self.separable_conv2d(out,out_channel=1024,kernel_size=[3,3,1024,1],stride=1)
 		out = tf.layers.average_pooling2d(out,pool_size=1,strides=1)
 		out = tf.layers.flatten(out)
-		out = tf.layers.dropout(out,rate=0.5)
-		predicts = tf.layers.dense(out,units=self.num_classes,kernel_regularizer=self.regularizer,name='fc')
+		out = tf.layers.dropout(out,rate=self.keep_prob)
+		predicts = tf.layers.dense(out,units=self.num_classes,kernel_initializer=self.initializer,kernel_regularizer=self.regularizer,name='fc')
 		softmax_out = tf.nn.softmax(predicts,name='output')
 		return predicts,softmax_out
 
